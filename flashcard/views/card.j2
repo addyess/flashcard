@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Flashcard{% endblock %}
+{% block head %}
+    {{ super() }}
+    <script type="text/javascript">
+    <!--//
+        {% include "card.js" %}
+    //-->
+    </script>
+{% endblock %}
+{% block content %}
+    <div class="container-fluid">
+        <form class="h-100" id="card" action="card">
+        <div class="row bg-light p-5">
+            <h1> Flash Cards </h1>
+        </div>
+        <div class="row" style="height: 600px">
+            <div class="col-6 h-100">
+                <div class="container h-100">
+                    {% for s in range(1,4) %}
+                        <div class="row h-25">
+                            {% for i in range(s,10,3) %}
+                            <input class="btn btn-outline-primary col" type="button" style="font-size: 40px" value="{{ i }}">
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <div class="row h-25">
+                        <input class="btn btn-outline-primary col-8" style="font-size: 40px" type="button" value="0">
+                        <input class="btn btn-outline-primary col-4" style="font-size: 40px" type="reset" value="C">
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 h-100">
+                <div class="container h-100">
+                    <div class="card">
+                      <div class="card-body" style="font-size: 100px; text-align: right">
+                        <h5 class="card-title" style="text-align: left;">Question</h5>
+                        <p class="card-text" >{{ a }}</p>
+                        <p class="card-text" >{{ op }} {{ b }}</p>
+                        <input name="ans"
+                               class="form-control col"
+                               type="text" placeholder=""
+                               autocomplete="off"
+                               style="font-size: 100px; text-align: right"
+                       />
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3 h-100">
+                <div id="timeout-row" class="container h-100">
+                    <div class="card">
+                      <div class="card-body" style="font-size: 100px; text-align: right">
+                        <h5 class="card-title" style="text-align: left;">Timer</h5>
+                        <p id="timeout" class="card-text" style="font-size: 80px; text-align: right">NaN</p>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+
+{% endblock %}

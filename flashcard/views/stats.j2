@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Flashcard Stats{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="bg-light p-5">
+            <h1> Statistics </h1>
+        </div>
+        <div class="row">
+            <div class="col-2">Finished in </div>
+            <div class="col-4">{{ duration }} seconds.</div>
+        </div>
+        {% for card, stat in repeated %}
+        <div class=row>
+            <div class="col-2">Repeated</div>
+            <div class="col-1">{{ card }} = {{ card.correct_ans }}</div>
+            <div class="col-3">correct {{ stat|selectattr('correct', '==', True)|list|length }} of {{ stat|length }} times.</div>
+        </div>
+        <div class=row/>
+        {% endfor %}
+        {% for card, stat in hardest %}
+        <div class=row>
+            <div class="col-2">Problem {{ "Correct" if stat.correct else "Incorrect" }} </div>
+            <div class="col-1">{{ card }} = {{ stat.user_answer }}</div>
+            <div class="col-3">took {{ stat.time }} seconds.</div>
+        </div>
+        {% endfor %}
+        <div class="row">
+            <div class="col-6">
+                <a href="/">Try Again?</a>
+            </div>
+            <div class="col-6">
+                <a href="/practice">Update Practice</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Flashcard Practice Set{% endblock %}
+{% block head %}
+    {{ super() }}
+    <script type="text/javascript">
+    <!--//
+        {% include "practice.js" %}
+    //-->
+    </script>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="bg-light p-5"><h1> Practice Set </h1></div>
+        <div class="row"><div class="col-6">
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col"> # </th>
+                        <th scope="col"> Question </th>
+                    </tr>
+                </thead>
+                <tr scope=row class="clone">
+                    <th scope="col">
+                        <button type="button" class="btn btn-primary addable">+</button>
+                    </th>
+                    <td><div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">?</span>
+                      </div>
+                      <input type="text" pattern="\d+ [\-+x/] \d+"
+                         oninput="this.reportValidity()"
+                         class="form-control card" value=""
+                      >
+                    </div></td>
+                </tr>
+            </table>
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <a href="/" type="button" class="btn btn-success">Go</a>
+                <a href="/practice" type="reset" class="btn btn-warning">Reset</a>
+                <button type="button" class="btn btn-primary submit">Apply</button>
+            </div>
+        </div>
+        <div class="col-6">
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col"> Control </th>
+                    </tr>
+                </thead>
+                <tr><td>
+                    <div class="input-group mb-3">
+                      <span class="input-group-text">Repeat Question</span>
+                      <select class="form-select" aria-label="Repeat">
+                      {% for val, text in [("none", "Don't Repeat"),
+                                           ("end", "Repeat Later"),
+                                           ("next", "Repeat Immediately")] %}
+                          <option class="repeat" value="{{ val }}" {{"selected" if val == args.repeat else ""}}>{{ text }}</option>
+                      {% endfor %}
+                      </select>
+                    </div>
+                </td></tr><tr><td>
+                    <div class="input-group mb-3">
+                        <label for="wait_time" class="form-label">Time Limit (sec): <span>{{ args.wait_time }}</span></label>
+                        <input type="range" class="form-range" min="0" max="30" id="wait_time" value="{{ args.wait_time }}">
+                    </div>
+                </td></tr><tr><td>
+                    <div class="input-group mb-3">
+                        <label for="total" class="form-label">Number of Problems: <span>{{ args.total }}</span></label>
+                        <input type="range" class="form-range" min="5" max="50" id="total" value="{{ args.total }}"">
+                    </div>
+                </td></tr><tr><td>
+                    <span class="input-group-text">Operators</span>
+                    {% for op in "+-x/" %}
+                    <div class="form-check">
+                      <input class="form-check-input operators" type="checkbox" value="{{ op }}" {{ "checked" if op in args.operators else "" }}>
+                      <label class="form-check-label" for="flexCheckDefault">{{ op }}</label>
+                    </div>
+                    {% endfor %}
+                </td></tr>
+            </table>
+        </div>
+        </div>
+    </div>
+{% endblock %}
