@@ -2,7 +2,7 @@ import os
 from bottle import Bottle, run, request, redirect, response
 from bottle import jinja2_view as view
 from bottle import TEMPLATE_PATH
-from flashcard.logic import UX, Statistics, next_card
+from flashcard.logic import UX, Statistics, next_card, UserResponse
 
 TEMPLATE_PATH.insert(0, os.path.join(os.path.dirname(__file__), 'views'))
 
@@ -58,21 +58,22 @@ class WebUX(UX):
     @view('card.j2')
     def _card(self):
         ans = request.query.get('ans')
+        card_id = request.query.get('card_id')
         if ans is not None:
-            val = int(ans) if ans.isdigit() else "timeout"
             try:
-                self._all_cards.send(val)
+                user_resp = UserResponse(
+                    card_id, int(ans) if ans.isdigit() else "timeout"
+                )
+                self._all_cards.send(user_resp)
             except TypeError:
                 return redirect("/")
+            except StopIteration:
+                return redirect("/stats")
         card = next(self._all_cards, None)
         if not card:
             return redirect("/stats")
         return dict(
-            a=card.a,
-            b=card.b,
-            op=card.op,
-            ans=card.correct_ans,
-            args=self.args
+            card=card, args=self.args
         )
 
     def main(self):

@@ -1,8 +1,7 @@
 #!/bin/env python3
 
-import signal
 import random
-import threading
+from uuid import uuid4
 from itertools import takewhile
 from datetime import datetime
 from collections import namedtuple, defaultdict
@@ -18,6 +17,7 @@ TOTAL_QUESTIONS = 50
 
 TIMEOUT = "timeout"
 Record = namedtuple('Record', 'time, correct, user_answer')
+UserResponse = namedtuple("UserResponse", "id, val")
 
 
 class Statistics:
@@ -48,7 +48,7 @@ class Statistics:
         return longest
 
 
-class Card(namedtuple('Card', 'a, op, b, correct_ans')):
+class Card(namedtuple('Card', 'a, op, b, correct_ans, id')):
     def __new__(cls, a, op, b):
         py_op = {
             'x': '*',
@@ -56,11 +56,22 @@ class Card(namedtuple('Card', 'a, op, b, correct_ans')):
         }
         _op = py_op.get(op) or op
         correct_ans = eval(f"{a} {_op} {b}")
-        self = super().__new__(cls, a, op, b, correct_ans)
+        card_id = uuid4()
+        self = super().__new__(cls, a, op, b, correct_ans, card_id)
         return self
+
+    def __init__(self, *args):
+        self.correctly_answered = False
 
     def __str__(self):
         return f"{str(self.a)} {self.op} {str(self.b)}"
+
+    def test(self, user_response):
+        if user_response.id != str(self.id):
+            return None
+        if not self.correctly_answered:
+            self.correctly_answered = user_response.val == self.correct_ans
+        return self.correctly_answered
 
     @classmethod
     def create(cls, a, b, op):
@@ -121,16 +132,17 @@ def next_card(args, statistics):
     while unsolved:
         card, unsolved = unsolved[0], unsolved[1:]
         pre_timer = datetime.now()
-        user_ans = (yield card)
+        user_response = (yield card)
         total_time = datetime.now() - pre_timer
-        correct = user_ans == card.correct_ans
+        correct = card.test(user_response)
         yield correct
-        if not correct:
+        if correct is False:
             if args.repeat == 'end':
                 unsolved += [card]
             elif args.repeat == "next":
                 unsolved.insert(0, card)
-        statistics.record(card, total_time, user_ans)
+        if correct is not None:
+            statistics.record(card, total_time, user_response.val)
 
 
 def file_maker(arg):
@@ -183,98 +195,3 @@ class UX:
             out.print(f"Repeated '{card}' {len(stat)} times")
         for card, stat in stats.hardest:
             out.print(f"Problem  '{card}' took {stat.time} seconds")
-
-
-class GnomeUX(UX):
-    def __init__(self, args):
-        super().__init__(args)
-        self.output = None
-        self.input = None
-        self.setup()
-
-    def main(self):
-        thread = threading.Thread(target=super().main)
-        thread.daemon = True
-        thread.start()
-        Gtk.main()
-
-    def setup(self):
-        import Gtk
-        window = Gtk.Window(title="Flash Cards")
-        window.set_border_width(50)
-
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
-        window.add(vbox)
-
-        self.output = Gtk.Label(label="Let's Begin")
-        vbox.pack_start(self.output, True, True, 0)
-
-        self.input = Gtk.Entry()
-        self.input.set_text("")
-        vbox.pack_start(self.input, True, True, 0)
-
-        window.show()
-        window.connect("destroy", Gtk.main_quit)
-        window.show_all()
-
-    def __next__(self):
-        self.output.set_text('')
-        self.input.set_text('')
-        return self
-
-    def print(self, new=None):
-        old = self.output.get_text()
-        self.output.set_text('\n'.join(filter(None, [old, new])))
-
-    def user_input_int(self, prompt):
-        def pending(entry):
-            event.value = entry.get_text()
-            event.set()
-
-        valid = None
-        while not valid:
-            if valid is False:
-                self.print("Sorry, that's not a valid integer")
-            self.print(prompt)
-            event = threading.Event()
-            handle_id = self.input.connect('activate', pending)
-            ok = event.wait(self.args.wait_time if self.args.wait_time > 0 else None)
-            try:
-                if not ok:
-                    return TIMEOUT
-                return int(event.value)
-            except ValueError:
-                valid = False
-            finally:
-                self.input.disconnect(handle_id)
-
-
-class CliUX(UX):
-    def __next__(self):
-        self.print("=================yay====================")
-        return self
-
-    @property
-    def print(self):
-        return print
-
-    def user_input_int(self, prompt):
-        def raised(_signal, _timeout):
-            self.print()
-            raise TimeoutError()
-
-        valid = None
-        while not valid:
-            if valid is False:
-                self.print("Sorry, that's not a valid integer..")
-            signal.signal(signal.SIGALRM, raised)
-            try:
-                if self.args.wait_time > 0:
-                    signal.alarm(self.args.wait_time)
-                return int(input(prompt))
-            except TimeoutError:
-                return TIMEOUT
-            except ValueError:
-                valid = False
-            finally:
-                signal.alarm(0)

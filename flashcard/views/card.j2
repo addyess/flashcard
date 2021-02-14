@@ -35,8 +35,9 @@
                     <div class="card">
                       <div class="card-body" style="font-size: 100px; text-align: right">
                         <h5 class="card-title" style="text-align: left;">Question</h5>
-                        <p class="card-text" >{{ a }}</p>
-                        <p class="card-text" >{{ op }} {{ b }}</p>
+                        <p class="card-text" >{{ card.a }}</p>
+                        <p class="card-text" >{{ card.op }} {{ card.b }}</p>
+                        <input name="card_id" type="hidden" value={{ card.id }}>
                         <input name="ans"
                                class="form-control col"
                                type="text" placeholder=""
@@ -48,9 +49,9 @@
                 </div>
             </div>
             <div class="col-3 h-100">
-                <div id="timeout-row" class="container h-100">
+                <div id="timeout-row" class="container h-100" style="display: none;">
                     <div class="card">
-                      <div class="card-body" style="font-size: 100px; text-align: right">
+                      <div class="card-body" style="font-size: 100px; text-align: right;">
                         <h5 class="card-title" style="text-align: left;">Timer</h5>
                         <p id="timeout" class="card-text" style="font-size: 80px; text-align: right">NaN</p>
                       </div>
