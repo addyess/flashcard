@@ -40,6 +40,7 @@ function update(){
             repeat: $(".repeat:selected").val(),
             wait_time: parseInt($("#wait_time").val()),
             total: parseInt($("#total").val()),
+            no_hints: $("#hints").is(':checked') == false,
             operators: $(".operators:checked").map(function(){return $(this).val()}).get().join(''),
         }),
     });

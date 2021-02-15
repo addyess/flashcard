@@ -61,6 +61,7 @@ class Card(namedtuple('Card', 'a, op, b, correct_ans, id')):
         return self
 
     def __init__(self, *args):
+        self.tries = 0
         self.correctly_answered = False
 
     def __str__(self):
@@ -69,6 +70,7 @@ class Card(namedtuple('Card', 'a, op, b, correct_ans, id')):
     def test(self, user_response):
         if user_response.id != str(self.id):
             return None
+        self.tries += 1
         if not self.correctly_answered:
             self.correctly_answered = user_response.val == self.correct_ans
         return self.correctly_answered

@@ -17,6 +17,7 @@ def parseargs():
     parser.add_argument("--operators", "-o", type=str, default='*',
                         help="List of flash card operators. (eg. '-+x/')")
     parser.add_argument("--repeat", choices=["end", "next", "none"], default="end")
+    parser.add_argument("--no_hints", action="store_true", default=False)
     return parser.parse_args()
 
 

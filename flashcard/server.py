@@ -45,6 +45,7 @@ class WebUX(UX):
         self.args.wait_time = user_req['wait_time']
         self.args.operators = user_req['operators']
         self.args.repeat = user_req['repeat']
+        self.args.no_hints = user_req['no_hints']
         return {}
 
     @view('stats.j2')

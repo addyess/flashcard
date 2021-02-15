@@ -39,8 +39,10 @@
                         <p class="card-text" >{{ card.op }} {{ card.b }}</p>
                         <input name="card_id" type="hidden" value={{ card.id }}>
                         <input name="ans"
-                               class="form-control col"
-                               type="text" placeholder=""
+                               class="form-control col" type="text"
+                               {% if not args.no_hints %}
+                               placeholder="{{card.correct_ans if card.tries > 0 else ""}}"
+                               {% endif %}
                                autocomplete="off"
                                style="font-size: 100px; text-align: right"
                        />
