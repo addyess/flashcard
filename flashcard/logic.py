@@ -115,16 +115,17 @@ def cards(args):
             Card.create(*parse(data))
             for data in args.practice_data
         ]
-    operators = args.operators
-    tables = args.tables
-    _generated = [
-        card
-        for op in operators
-        for card in Card.from_table(tables, op)
-    ]
-    _generated = list(set(_ for _ in _generated if _ not in _practice))
-    random.shuffle(_generated)
-    _cards = _practice + _generated[:args.total - len(_practice)]
+    operators, tables = args.operators, args.tables
+    _generated, extra = [], max(args.total - len(_practice), 0)
+    if extra > 0:
+        _generated = [
+            card
+            for op in operators
+            for card in Card.from_table(tables, op)
+        ]
+        _generated = list(set(_ for _ in _generated if _ not in _practice))
+        random.shuffle(_generated)
+    _cards = _practice + _generated[:extra]
     random.shuffle(_cards)
     return _cards[:args.total]
 
