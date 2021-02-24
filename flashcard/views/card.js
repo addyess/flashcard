@@ -1,5 +1,6 @@
 function update_timer(ansBox, wait_time){
     var page_wait = {{ args.wait_time }};
+    var disable_timer = (page_wait == 0 || {{ "true" if not args.no_hints and card.tries > 0 else "false" }});
     var yellow = Math.ceil(2 * page_wait / 3) + 1;
     var red = Math.ceil(page_wait / 3) + 1;
     var timeoutBox = $("#timeout");
@@ -12,7 +13,7 @@ function update_timer(ansBox, wait_time){
     }
 
     var timeoutElem = $("#timeout-row");
-    if (wait_time > 0 ){
+    if ( !disable_timer && wait_time > 0 ){
         timeoutElem.show();
         if (wait_time < yellow){ timeoutBox.css("background-color", "yellow"); }
         if (wait_time < red){ timeoutBox.css("background-color", "red"); }
