@@ -1,4 +1,6 @@
 #!/bin/env python3
+# -*- coding: utf-8 -*-
+
 
 import random
 from uuid import uuid4
@@ -50,9 +52,10 @@ class Statistics:
 
 class Card(namedtuple('Card', 'a, op, b, correct_ans, id')):
     def __new__(cls, a, op, b):
+        op = '÷' if op == '/' else op
         py_op = {
             'x': '*',
-            '/': '//',
+            '÷': '//'
         }
         _op = py_op.get(op) or op
         correct_ans = eval(f"{a} {_op} {b}")
@@ -77,14 +80,14 @@ class Card(namedtuple('Card', 'a, op, b, correct_ans, id')):
 
     @classmethod
     def create(cls, a, b, op):
-        if op in '+-x/':
+        if op in '+-x/÷':
             return cls(a, op, b)
         raise ArithmeticError("Invalid Operator")
 
     @classmethod
     def from_table(cls, tables, op):
         def eval_first(a, b):
-            _op = '*' if op == '/' else '+'
+            _op = '*' if op in '/÷' else '+'
             ans = eval(f"{a} {_op} {b}")
             try:
                 return cls.create(ans, b, op)

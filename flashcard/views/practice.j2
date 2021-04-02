@@ -27,7 +27,7 @@
                       <div class="input-group-prepend">
                         <span class="input-group-text">?</span>
                       </div>
-                      <input type="text" pattern="\d+ [\-+x/] \d+"
+                      <input type="text" pattern="\d+ [\-+x/÷] \d+"
                          oninput="this.reportValidity()"
                          class="form-control card" value=""
                       >
@@ -75,7 +75,7 @@
                     </div>
                 </td></tr><tr><td>
                     <span class="input-group-text">Operators</span>
-                    {% for op in "+-x/" %}
+                    {% for op in "+-x÷" %}
                     <div class="form-check">
                       <input class="form-check-input operators" type="checkbox" value="{{ op }}" {{ "checked" if op in args.operators else "" }}>
                       <label class="form-check-label" for="flexCheckDefault">{{ op }}</label>

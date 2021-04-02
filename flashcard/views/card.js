@@ -30,7 +30,8 @@ $(document).ready(function(){
     var ansBox = $(":text");
     var card = $("#card");
     function check_length() {
-        if ( ansBox.val().length >= ans.length ) {
+        this.value = this.value.replace(/[^0-9\.]/g,'');
+        if ( this.value.length >= ans.length ) {
             card.submit();
         }
     }
