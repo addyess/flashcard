@@ -10,7 +10,7 @@ def parseargs():
         "-i",
         type=file_maker,
         default=None,
-        help="load questions from a file, ignoring tables, " "max-int, and operators",
+        help="load questions from a file, ignoring tables, max-int, and operators",
     )
     parser.add_argument(
         "--tables",

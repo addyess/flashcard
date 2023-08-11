@@ -1,5 +1,5 @@
 import os
-from bottle import Bottle, run, request, redirect, response
+from bottle import Bottle, run, request, redirect
 from bottle import jinja2_view as view
 from bottle import TEMPLATE_PATH
 from flashcard.logic import UX, Statistics, next_card, UserResponse
@@ -32,11 +32,7 @@ class WebUX(UX):
         return dict(enumerate=enumerate, args=self.args)
 
     def _update(self):
-        try:
-            user_req = request.json
-        except:
-            response.status = 400
-            return
+        user_req = request.json
         self.args.practice_data = user_req["practice_data"]
         self.args.total = user_req["total"]
         self.args.wait_time = user_req["wait_time"]
