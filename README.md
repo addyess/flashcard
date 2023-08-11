@@ -9,8 +9,9 @@ It's not perfect -- but my kids are getting better at math so... yah
 Example Running 25 Multiplication Questions, 10 second timer, and repeat right away if you miss
 
 ```bash
-virtualenv -p python3 venv
-. venv/bin/activate
-pip install -r requirements.txt
-python -m flashcard -N 25 -i practice.txt -w 10 -o x --repeat next
+# run with the default arguments
+tox
+
+# run with 25 subtraction problems, waiting 15s and repeats later
+tox -- -N 25 -i practice.txt -w 15 -o - --repeat later
 ```

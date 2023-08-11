@@ -18,7 +18,7 @@ GNOME_UX = False
 TOTAL_QUESTIONS = 50
 
 TIMEOUT = "timeout"
-Record = namedtuple('Record', 'time, correct, user_answer')
+Record = namedtuple("Record", "time, correct, user_answer")
 UserResponse = namedtuple("UserResponse", "id, val")
 
 
@@ -37,26 +37,25 @@ class Statistics:
 
     @property
     def repeated(self):
-        longest = sorted(self.card_stats.items(), key=lambda elem: len(elem[1]), reverse=True)
+        longest = sorted(
+            self.card_stats.items(), key=lambda elem: len(elem[1]), reverse=True
+        )
         return takewhile(lambda elem: 1 < len(elem[1]) == len(longest[0][1]), longest)
 
     @property
     def hardest(self):
-        longest = sorted((
-            (c, rec)
-            for c, recs in self.card_stats.items()
-            for rec in recs
-        ), key=lambda elem: elem[1], reverse=True)
+        longest = sorted(
+            ((c, rec) for c, recs in self.card_stats.items() for rec in recs),
+            key=lambda elem: elem[1],
+            reverse=True,
+        )
         return longest
 
 
-class Card(namedtuple('Card', 'a, op, b, correct_ans, id')):
+class Card(namedtuple("Card", "a, op, b, correct_ans, id")):
     def __new__(cls, a, op, b):
-        op = '÷' if op == '/' else op
-        py_op = {
-            'x': '*',
-            '÷': '//'
-        }
+        op = "÷" if op == "/" else op
+        py_op = {"x": "*", "÷": "//"}
         _op = py_op.get(op) or op
         correct_ans = eval(f"{a} {_op} {b}")
         card_id = uuid4()
@@ -80,31 +79,27 @@ class Card(namedtuple('Card', 'a, op, b, correct_ans, id')):
 
     @classmethod
     def create(cls, a, b, op):
-        if op in '+-x/÷':
+        if op in "+-x/÷":
             return cls(a, op, b)
         raise ArithmeticError("Invalid Operator")
 
     @classmethod
     def from_table(cls, tables, op):
         def eval_first(a, b):
-            _op = '*' if op in '/÷' else '+'
+            _op = "*" if op in "/÷" else "+"
             ans = eval(f"{a} {_op} {b}")
             try:
                 return cls.create(ans, b, op)
             except ZeroDivisionError:
                 return None
 
-        if op in 'x+':
+        if op in "x+":
             return (
-                cls.create(a, b, op)
-                for a in range(0, max(tables) + 1)
-                for b in tables
+                cls.create(a, b, op) for a in range(0, max(tables) + 1) for b in tables
             )
-        return filter(None, (
-            eval_first(a, b)
-            for a in range(0, max(tables) + 1)
-            for b in tables
-        ))
+        return filter(
+            None, (eval_first(a, b) for a in range(0, max(tables) + 1) for b in tables)
+        )
 
 
 def cards(args):
@@ -114,23 +109,16 @@ def cards(args):
 
     _practice = []
     if args.practice_data:
-        _practice = [
-            Card.create(*parse(data))
-            for data in args.practice_data
-        ]
+        _practice = [Card.create(*parse(data)) for data in args.practice_data]
     operators, tables = args.operators, args.tables
     _generated, extra = [], max(args.total - len(_practice), 0)
     if extra > 0:
-        _generated = [
-            card
-            for op in operators
-            for card in Card.from_table(tables, op)
-        ]
+        _generated = [card for op in operators for card in Card.from_table(tables, op)]
         _generated = list(set(_ for _ in _generated if _ not in _practice))
         random.shuffle(_generated)
     _cards = _practice + _generated[:extra]
     random.shuffle(_cards)
-    return _cards[:args.total]
+    return _cards[: args.total]
 
 
 def next_card(args, statistics):
@@ -138,12 +126,12 @@ def next_card(args, statistics):
     while unsolved:
         card, unsolved = unsolved[0], unsolved[1:]
         pre_timer = datetime.now()
-        user_response = (yield card)
+        user_response = yield card
         total_time = datetime.now() - pre_timer
         correct = card.test(user_response)
         yield correct
         if correct is False:
-            if args.repeat == 'end':
+            if args.repeat == "end":
                 unsolved += [card]
             elif args.repeat == "next":
                 unsolved.insert(0, card)
@@ -153,17 +141,13 @@ def next_card(args, statistics):
 
 def file_maker(arg):
     with open(arg) as f:
-        return [
-            line.strip()
-            for line in f
-            if not line.startswith("#")
-        ]
+        return [line.strip() for line in f if not line.startswith("#")]
 
 
 def range_maker(arg):
     def split_hyphens(commas):
         for sep in commas:
-            ranges = sep.split('-')
+            ranges = sep.split("-")
             if len(ranges) == 2:
                 for i in range(*[int(s) for s in ranges]):
                     yield i
@@ -171,6 +155,7 @@ def range_maker(arg):
                 yield int(ranges[0])
             else:
                 raise TypeError(f"Invalid Range {sep}")
+
     return list(split_hyphens(arg.split(",")))
 
 
